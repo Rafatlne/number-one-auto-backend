@@ -1,13 +1,25 @@
 # -----------------------------------------------------
-FROM python:3.10
+FROM python:3.12.10-bullseye
+
 WORKDIR /app
 
-ENV PYTHONUNBUFFERED=1
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    netcat-openbsd \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir gunicorn
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy requirements and install Python dependencies
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# Copy project
 COPY . .
-RUN DJANGO_SETTINGS_MODULE=conf.settings.dev python manage.py collectstatic --noinput
 
-ENV DJANGO_SETTINGS_MODULE=conf.settings.dev
+# Copy and make entrypoint executable
+COPY entrypoint.sh .
+COPY wait-for-it.sh .
+RUN chmod +x entrypoint.sh wait-for-it.sh
+
+EXPOSE 8000
+
+CMD ["./entrypoint.sh"]

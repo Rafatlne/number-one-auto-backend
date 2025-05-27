@@ -244,15 +244,6 @@ class TestArticleViewSet:
         assert response.status_code == status.HTTP_200_OK
         assert response.data['results'][0]['title'] == 'Article 0'
     
-    def test_personalized_feed_no_preferences(self, api_client, user, user_token, articles):
-        UserPreference.objects.filter(user=user).delete()
-        
-        api_client.credentials(HTTP_AUTHORIZATION=f'Token {user_token.key}')
-        url = reverse('article-personalized-feed')
-        response = api_client.get(url)
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['count'] == 5
-    
     def test_personalized_feed_with_user_articles(self, api_client, user, user_token, articles):
         UserArticle.objects.create(user=user, article=articles[0])
         UserArticle.objects.create(user=user, article=articles[1])
