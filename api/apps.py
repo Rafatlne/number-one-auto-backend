@@ -7,5 +7,5 @@ class ApiConfig(AppConfig):
     
     def ready(self):
         import api.signals
-        from tasks.fetch_news_task import fetch_news_task
-        fetch_news_task(repeat=600)
+        # Remove background task initialization from here
+        # It will be called from entrypoint.sh after migrations
